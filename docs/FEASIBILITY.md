@@ -1,6 +1,6 @@
 # Attachment feasibility
 
-Verified on 2026-10-08 with Chrome for Testing (local Playwright Chromium build 1234) using `scripts/browser-check.mjs`.
+Verified on 2026-10-08 with Chrome for Testing 151.0.7922.34 (local Playwright Chromium build 1234) using `scripts/browser-check.mjs`. The first branch established this proof before session implementation; the final test now exercises the production storage, download, panel, and attachment handlers.
 
 The test fetches a direct HTTP download from a loopback server in an extension page, writes its Blob to IndexedDB, reads it back, and compares the bytes. It serializes the bytes through `chrome.scripting.executeScript`, constructs a File and DataTransfer in the isolated world, and assigns the FileList to a native upload input. The server receives no form submission until the test explicitly clicks the form's Submit button; the resulting multipart body contains the original bytes.
 

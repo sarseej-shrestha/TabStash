@@ -96,6 +96,12 @@ try {
   await assert.rejects(rpc(panel, 'attach', { sessionId, tabId: tab.id, fileId, documentId: oldScan.documentId, token: oldScan.fields[0].token }), /document|changed|frame/i);
   await assert.rejects(rpc(panel, 'scan', { sessionId: 'wrong-session', tabId: tab.id }), /Link this tab/);
   await target.evaluate(() => {
+    const fieldset = document.createElement('fieldset'); fieldset.disabled = true;
+    const input = document.querySelector('input'); input.before(fieldset); fieldset.append(input);
+  });
+  assert.equal((await rpc(panel, 'scan', { sessionId, tabId: tab.id })).fields.length, 0);
+  await target.evaluate(() => { document.querySelector('fieldset').disabled = false; });
+  await target.evaluate(() => {
     window.inputEvents = 0;
     document.querySelector('input').addEventListener('change', () => window.inputEvents++);
     document.querySelector('input').addEventListener('input', () => window.inputEvents++);

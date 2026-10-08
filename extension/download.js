@@ -22,10 +22,14 @@ export async function fetchDirectFile(url, fetcher = fetch) {
     method: 'GET', credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer',
     cache: 'no-store', signal: AbortSignal.timeout(25_000),
   });
-  if (!response.ok) throw new Error(`Download returned HTTP ${response.status}. Download normally, then use Add files.`);
+  const rejectResponse = async message => {
+    await response.body?.cancel().catch(() => {});
+    throw new Error(message);
+  };
+  if (!response.ok) return rejectResponse(`Download returned HTTP ${response.status}. Download normally, then use Add files.`);
   const type = (response.headers.get('content-type') || 'application/octet-stream').split(';')[0].trim();
-  if (['text/html', 'application/xhtml+xml'].includes(type)) throw new Error('The link returned a web page. Download the actual file normally, then use Add files.');
-  if (Number(response.headers.get('content-length')) > MAX_FILE_BYTES) throw new Error('This file exceeds the 20 MiB limit.');
+  if (['text/html', 'application/xhtml+xml'].includes(type)) return rejectResponse('The link returned a web page. Download the actual file normally, then use Add files.');
+  if (Number(response.headers.get('content-length')) > MAX_FILE_BYTES) return rejectResponse('This file exceeds the 20 MiB limit.');
   if (!response.body) throw new Error('The link returned no file content. Use Add files instead.');
   const reader = response.body.getReader();
   const chunks = [];

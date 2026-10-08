@@ -2,7 +2,7 @@
 export function inspectInputs() {
   const targets = new Map();
   const fields = [...document.querySelectorAll('input[type="file"]')]
-    .filter(input => !input.disabled && !input.webkitdirectory && input.form)
+    .filter(input => !input.matches(':disabled') && !input.webkitdirectory && input.form)
     .map((input, index) => {
       const token = crypto.randomUUID();
       targets.set(token, input);
@@ -15,7 +15,7 @@ export function inspectInputs() {
 
 export function attachToInput(payload, token) {
   const input = globalThis.__uploadSessionTargets?.get(token);
-  if (!input?.isConnected || input.type !== 'file' || !input.form || input.disabled || input.webkitdirectory) {
+  if (!input?.isConnected || input.type !== 'file' || !input.form || input.matches(':disabled') || input.webkitdirectory) {
     throw new Error('This upload field is unavailable. Use the website’s file picker.');
   }
   if (input.files.length) throw new Error('The field already has a file. Clear it on the website before attaching.');

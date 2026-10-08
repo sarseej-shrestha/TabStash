@@ -27,7 +27,12 @@ export function startFixture(port = 0) {
       <form action="/submit" method="post" enctype="multipart/form-data">
         <label>Document <input id="document" type="file" name="document" accept=".txt,text/plain"></label>
         <button type="submit">Submit myself</button>
-      </form></html>`);
+      </form>
+      <h2>Manual fallback checks</h2>
+      <p><a href="http://localhost:${server.address().port}/sample.txt">Download sample.txt from another origin (permission prompt test)</a></p>
+      <ul><li><a href="/redirect">Redirected download (unsupported)</a></li>
+      <li><a href="/large">Oversized download (unsupported)</a></li>
+      <li><a href="/">HTML page instead of a file (unsupported)</a></li></ul></html>`);
   });
   return new Promise(resolve => server.listen(port, '127.0.0.1', () => resolve({
     server, url: `http://127.0.0.1:${server.address().port}`, submissions: () => submissions, downloads: () => downloads,

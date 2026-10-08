@@ -43,10 +43,11 @@ try {
       request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
     });
     if (await restored.text() !== content) throw new Error('Stored bytes changed');
-    const { attachToInput, serializeFile } = await import('./attach.js');
+    const { attachToInput, serializeFile, inspectInputs } = await import('./attach.js');
     const tab = (await chrome.tabs.query({})).find(tab => tab.url === url + '/');
+    const [scan] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: inspectInputs });
     const [result] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: attachToInput,
-      args: [await serializeFile({ blob: restored, name: 'sample.txt', lastModified: 1 })] });
+      args: [await serializeFile({ blob: restored, name: 'sample.txt', lastModified: 1 }), scan.result[0].token] });
     db.close();
     return result.result;
   }, { url: fixture.url, content: fixtureBytes.toString() });

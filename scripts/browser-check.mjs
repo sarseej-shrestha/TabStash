@@ -24,9 +24,18 @@ try {
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   const id = new URL(worker.url()).host;
   const panel = await context.newPage();
+  await panel.setViewportSize({ width: 390, height: 900 });
   await panel.goto(`chrome-extension://${id}/panel.html`);
   const target = await context.newPage();
   await target.goto(fixture.url);
+  await panel.waitForFunction(() => !document.getElementById('controls').disabled);
+  await panel.locator('#session-name').fill('Local upload check');
+  await panel.evaluate(() => document.getElementById('create-form').requestSubmit());
+  await panel.waitForFunction(() => document.getElementById('status').textContent.includes('Session created'));
+  await panel.locator('#local-files').setInputFiles({ name: 'picker.txt', mimeType: 'text/plain', buffer: Buffer.from('picker fallback') });
+  await panel.waitForFunction(() => document.querySelector('#temporary-files .file-name')?.textContent === 'picker.txt');
+  await panel.getByRole('button', { name: 'Keep', exact: true }).click();
+  await panel.waitForFunction(() => document.querySelector('#kept-files .file-name')?.textContent === 'picker.txt');
   const result = await panel.evaluate(async ({ url, content }) => {
     const blob = await (await fetch(url + '/sample.txt', { credentials: 'omit', redirect: 'error' })).blob();
     const db = await new Promise((resolve, reject) => {

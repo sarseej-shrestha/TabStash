@@ -1,7 +1,78 @@
 <!doctype html>
 <html lang="en">
-<meta charset="utf-8">
-<title>Upload Session</title>
-<h1>Upload Session</h1>
-<p>Attachment feasibility fixture. The session interface follows after verification.</p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upload Session</title>
+  <link rel="stylesheet" href="panel.css">
+  <script type="module" src="panel.js"></script>
+</head>
+<body>
+  <header class="masthead"><span class="mark" aria-hidden="true">↑</span><div><h1>Upload Session</h1><p>Files for the task at hand.</p></div><span class="local-badge">LOCAL</span></header>
+  <div id="status" role="status" aria-live="polite">Opening local storage…</div>
+  <main>
+    <fieldset id="controls" disabled>
+      <section class="section">
+        <div class="section-heading"><h2>Your sessions</h2><span id="session-count" class="count">0</span></div>
+        <label for="session-select" class="sr-only">Current session</label>
+        <select id="session-select"><option value="">No active sessions</option></select>
+        <div class="row compact"><button id="rename" class="quiet">Rename</button><button id="end" class="quiet danger">End session</button></div>
+        <form id="create-form" class="row">
+          <label for="session-name" class="sr-only">New session name</label>
+          <input id="session-name" placeholder="Name a new session" maxlength="80" required autocomplete="off">
+          <button type="submit" class="primary">Create</button>
+        </form>
+        <p class="hint">New sessions link to your current tab.</p>
+      </section>
+
+      <section id="session-area" class="section" hidden>
+        <div class="section-heading"><h2>Linked tabs</h2><span id="tab-count" class="count"></span></div>
+        <p id="current-tab" class="current-tab"></p>
+        <button id="link-tab" class="wide">Link current tab</button>
+        <ul id="tab-list" class="tab-list"></ul>
+        <div class="section-heading files-heading"><h2>Temporary files</h2><span class="badge temporary">SESSION ONLY</span></div>
+        <p class="hint">Deleted when you end this session, close its last tab, or restart the browser.</p>
+        <label class="picker-label" for="local-files">Add files from your device</label>
+        <input id="local-files" type="file" multiple>
+        <p class="hint limits">20 MiB per file · 100 MiB per session</p>
+        <div id="temporary-files" class="file-list"></div>
+      </section>
+
+      <section id="pending-area" class="section download-card" hidden>
+        <div class="section-heading"><h2>Save this link</h2><button id="dismiss-link" class="quiet">Dismiss</button></div>
+        <p id="pending-url" class="url"></p>
+        <p id="permission-copy" class="hint"></p>
+        <button id="save-link" class="primary wide">Allow origin &amp; save to session</button>
+        <p class="hint">Direct public downloads only. Access is released after the attempt. If declined or unsupported, download normally and use Add files.</p>
+      </section>
+
+      <section class="section kept-section">
+        <div class="section-heading"><h2>Kept files</h2><span class="badge kept">UNTIL YOU DELETE</span></div>
+        <p class="hint">Stored locally, outside sessions. Available in any session.</p>
+        <div id="kept-files" class="file-list"></div>
+      </section>
+
+      <section class="section attach-section">
+        <div class="section-heading"><h2>Attach to this tab</h2><span class="step">↑</span></div>
+        <p id="selected-file" class="selection">Select a file above to get started.</p>
+        <p class="hint">On the destination tab, click the extension’s toolbar icon to allow access. Link the tab, then find a native upload field.</p>
+        <button id="scan" class="wide">Find upload fields</button>
+        <label for="upload-field" class="picker-label">Upload field</label>
+        <select id="upload-field"><option value="">Scan this page first</option></select>
+        <label class="consent"><input id="trust-page" type="checkbox"><span>I trust this page with this file. It can read the file as soon as I attach it.</span></label>
+        <button id="attach" class="primary wide">Attach selected file</button>
+        <p class="hint">Review and submit the form yourself. This extension never submits or triggers change events. Some websites upload on selection or need their normal picker.</p>
+        <details><summary>Need the normal file picker?</summary><p class="hint">Use Save copy on a file, then choose that copy with the website’s own file picker. Files you save to disk are outside session cleanup. Embedded frames, shadow DOM, custom uploaders, directory inputs and browser pages are unsupported.</p></details>
+      </section>
+      <footer><p>No account. No cloud. No analytics.</p><p>Cleanup removes extension copies only. Already attached files remain on the page until you clear its field or close it.</p><button id="release-access" class="quiet">Release download site access</button></footer>
+    </fieldset>
+  </main>
+  <dialog id="edit-dialog">
+    <form method="dialog" id="dialog-form">
+      <h2 id="dialog-title"></h2><p id="dialog-copy"></p>
+      <label id="dialog-label" for="dialog-name">Session name</label><input id="dialog-name" maxlength="80">
+      <div class="row"><button value="cancel" formnovalidate>Cancel</button><button id="dialog-confirm" value="confirm" class="primary">Confirm</button></div>
+    </form>
+  </dialog>
+</body>
 </html>

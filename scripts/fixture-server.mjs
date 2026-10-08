@@ -5,8 +5,12 @@ export const fixtureBytes = Buffer.from('Upload Session local attachment proof.\
 
 export function startFixture(port = 0) {
   let submissions = 0;
+  let downloads = 0;
   const server = http.createServer(async (req, res) => {
+    if (req.url === '/redirect') { res.writeHead(302, { Location: '/sample.txt' }); return res.end(); }
+    if (req.url === '/large') { res.writeHead(200, { 'Content-Length': String(21 * 1024 * 1024) }); return res.end(); }
     if (req.url === '/sample.txt') {
+      downloads++;
       res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Disposition': 'attachment; filename="sample.txt"' });
       return res.end(fixtureBytes);
     }
@@ -26,7 +30,7 @@ export function startFixture(port = 0) {
       </form></html>`);
   });
   return new Promise(resolve => server.listen(port, '127.0.0.1', () => resolve({
-    server, url: `http://127.0.0.1:${server.address().port}`, submissions: () => submissions,
+    server, url: `http://127.0.0.1:${server.address().port}`, submissions: () => submissions, downloads: () => downloads,
   })));
 }
 

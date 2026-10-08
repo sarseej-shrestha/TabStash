@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Upload Session",
+  "version": "0.1.0",
+  "description": "Local, temporary files for upload sessions across tabs.",
+  "minimum_chrome_version": "116",
+  "permissions": ["sidePanel", "activeTab", "scripting"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "Open Upload Session for this tab" },
+  "side_panel": { "default_path": "panel.html" },
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }
+}

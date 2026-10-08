@@ -36,3 +36,12 @@ test('download names are decoded and cannot contain paths or control characters'
   assert.equal(downloadName('https://example.test/report%20final.pdf'), 'report final.pdf');
   assert.equal(downloadName('https://example.test/'), 'download');
 });
+
+test('header-rejected responses cancel the network body immediately', async () => {
+  for (const init of [{ status: 403 }, { headers: { 'content-type': 'text/html' } }, { headers: { 'content-length': String(MAX_FILE_BYTES + 1) } }]) {
+    let cancelled = false;
+    const body = new ReadableStream({ cancel() { cancelled = true; } });
+    await assert.rejects(fetchDirectFile('https://example.test', async () => new Response(body, init)));
+    assert.equal(cancelled, true);
+  }
+});
